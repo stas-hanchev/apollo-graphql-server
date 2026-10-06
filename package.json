@@ -10,26 +10,30 @@
     "type": "git",
     "url": "git+https://github.com/stas-hanchev/apollo-graphql-server.git"
   },
-  "type": "commonjs",
+  "type": "module",
   "main": "src/index.js",
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
+    "studio": "prisma studio --url file://./dev.db",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@apollo/server": "^5.5.1",
+    "@prisma/adapter-better-sqlite3": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "graphql": "^16.14.2"
   },
   "devDependencies": {
+    "dotenv": "^18.0.5",
     "prisma": "^7.10.0"
   },
   "allowScripts": {
     "prisma@7.10.0": true,
     "@prisma/engines@7.10.0": true,
     "@prisma/client@7.10.0": true,
-    "@apollo/protobufjs@1.2.8": true
+    "@apollo/protobufjs@1.2.8": true,
+    "better-sqlite3@12.11.1": true
   },
   "overrides": {
     "deepmerge-ts": "^8.0.2",

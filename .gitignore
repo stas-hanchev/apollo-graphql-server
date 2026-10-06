@@ -141,3 +141,15 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+/src/generated/prisma
+
+# Claude AI generated files
+.claude/
+.agents/
+.windsurf/
+skills-lock.json
+
+# SQLite database files
+*.db
+*.db-journal
