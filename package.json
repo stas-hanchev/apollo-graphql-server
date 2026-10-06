@@ -1,7 +1,7 @@
 {
   "name": "apollo-graphql-server",
   "version": "1.0.0",
-  "description": "Appolo GraphQL Server (test project)",
+  "description": "Apollo GraphQL Server (test project)",
   "homepage": "https://github.com/stas-hanchev/apollo-graphql-server#readme",
   "bugs": {
     "url": "https://github.com/stas-hanchev/apollo-graphql-server/issues"
@@ -11,15 +11,28 @@
     "url": "git+https://github.com/stas-hanchev/apollo-graphql-server.git"
   },
   "type": "commonjs",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
+    "dev": "node --watch src/index.js",
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "apollo-server": "^2.26.2",
-    "graphql": "^14.7.0",
-    "nodemon": "^3.1.14"
+    "@apollo/server": "^5.5.1",
+    "@prisma/client": "^7.10.0",
+    "graphql": "^16.14.2"
+  },
+  "devDependencies": {
+    "prisma": "^7.10.0"
+  },
+  "allowScripts": {
+    "prisma@7.10.0": true,
+    "@prisma/engines@7.10.0": true,
+    "@prisma/client@7.10.0": true,
+    "@apollo/protobufjs@1.2.8": true
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.2",
+    "mysql2": "^3.24.5"
   }
 }
