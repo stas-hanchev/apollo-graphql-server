@@ -22,7 +22,9 @@
     "@apollo/server": "^5.5.1",
     "@prisma/adapter-better-sqlite3": "^7.10.0",
     "@prisma/client": "^7.10.0",
-    "graphql": "^16.14.2"
+    "bcryptjs": "^3.0.3",
+    "graphql": "^16.14.2",
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
     "dotenv": "^18.0.5",
