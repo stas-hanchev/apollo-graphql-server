@@ -1,0 +1,25 @@
+{
+  "name": "apollo-graphql-server",
+  "version": "1.0.0",
+  "description": "Appolo GraphQL Server (test project)",
+  "homepage": "https://github.com/stas-hanchev/apollo-graphql-server#readme",
+  "bugs": {
+    "url": "https://github.com/stas-hanchev/apollo-graphql-server/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stas-hanchev/apollo-graphql-server.git"
+  },
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "apollo-server": "^2.26.2",
+    "graphql": "^14.7.0",
+    "nodemon": "^3.1.14"
+  }
+}
