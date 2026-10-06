@@ -50,7 +50,7 @@ function validateLinkInput({ url, description }) {
 const resolvers = {
     Query: {
         info: () => `This is the API of a Hackernews Clone`,
-        feed: () => async (parent, args, context) => {
+        feed: async (parent, args, context) => {
             return await context.prisma.link.findMany();
         },
     },
@@ -74,11 +74,9 @@ const server = new ApolloServer({
         'utf8'
     ),
     resolvers,
-    context: {
-        prisma,
-    }
 });
 
-startStandaloneServer(server, { listen: { port: 4000 } }).then(({ url }) =>
-    console.log(`Server is running on ${url}`)
-);
+startStandaloneServer(server, {
+    context: async () => ({ prisma }),
+    listen: { port: 4000 },
+}).then(({ url }) => console.log(`Server is running on ${url}`));
