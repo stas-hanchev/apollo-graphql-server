@@ -66,6 +66,8 @@ Authorization: `Authorization: Bearer <token>` header (for WS — `connectionPar
 mutation { signup(name: "Alice", email: "alice@example.com", password: "secret") { token } }
 mutation { login(email: "alice@example.com", password: "secret") { token } }
 mutation { post(url: "https://graphql.org", description: "GraphQL") { id } }
+mutation { updateLink(id: 1, description: "GraphQL docs") { id url description } }   # author only
+mutation { deleteLink(id: 1) { id } }                                                  # author only
 query    { feed(filter: "graphql", skip: 0, take: 10, orderBy: { createdAt: desc }) { count links { id url } } }
 subscription { newLink { id url description } }
 ```
