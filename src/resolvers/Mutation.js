@@ -1,8 +1,10 @@
 import bcrypt from 'bcryptjs';
-import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
 import validateLinkInput from '../validation/url.js';
 import { APP_SECRET } from '../utils/utils.js';
+import { badInput } from '../utils/errors.js';
+
+const INVALID_CREDENTIALS = 'Invalid email or password';
 
 export default {
     signup: async (parent, args, context, info) => {
@@ -14,9 +16,7 @@ export default {
             });
         } catch (error) {
             if (error.code === 'P2002') {
-                throw new GraphQLError('User with this email already exists', {
-                    extensions: { code: 'BAD_USER_INPUT' },
-                });
+                throw badInput('User with this email already exists');
             }
             throw error;
         }
@@ -33,12 +33,12 @@ export default {
             where: { email: args.email },
         });
         if (!user) {
-            throw new Error('No such user found');
+            throw badInput(INVALID_CREDENTIALS);
         }
 
         const valid = await bcrypt.compare(args.password, user.password);
         if (!valid) {
-            throw new Error('Invalid password');
+            throw badInput(INVALID_CREDENTIALS);
         }
 
         const token = jwt.sign({ userId: user.id }, APP_SECRET);

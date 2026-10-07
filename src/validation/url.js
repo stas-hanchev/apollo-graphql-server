@@ -1,10 +1,7 @@
-import { GraphQLError } from 'graphql';
+import { badInput } from '../utils/errors.js';
 
 const MAX_URL_LENGTH = 2048;
 const MAX_DESCRIPTION_LENGTH = 500;
-
-const badInput = (message) =>
-    new GraphQLError(message, { extensions: { code: 'BAD_USER_INPUT' } });
 
 export const validateLinkInput = ({ url, description }) => {
     if (url.length > MAX_URL_LENGTH) {
