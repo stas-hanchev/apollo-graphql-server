@@ -19,7 +19,7 @@ import Mutation from './resolvers/Mutation.js';
 import Subscription from './resolvers/Subscription.js';
 import Link from './resolvers/Link.js';
 import User from './resolvers/User.js';
-import { getUserId } from './utils/utils.js';
+import { getOptionalUserId } from './utils/utils.js';
 
 const PORT = process.env.PORT || 4000;
 
@@ -65,7 +65,7 @@ const serverCleanup = useServer(
             return {
                 prisma,
                 pubsub,
-                userId: authToken ? getUserId(null, authToken) : null,
+                userId: authToken ? getOptionalUserId(null, authToken) : null,
             };
         },
     },
@@ -99,10 +99,15 @@ app.use(
             ...req,
             prisma,
             pubsub,
-            userId: req && req.headers.authorization ? getUserId(req) : null,
+            userId: req && req.headers.authorization ? getOptionalUserId(req) : null,
         }),
     })
 );
+
+httpServer.on('error', (error) => {
+    console.error('Failed to start HTTP server:', error);
+    process.exit(1);
+});
 
 httpServer.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}/graphql`);

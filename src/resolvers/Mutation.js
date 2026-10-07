@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
 import validateLinkInput from '../validation/url.js';
 import { APP_SECRET } from '../utils/utils.js';
@@ -6,9 +7,19 @@ import { APP_SECRET } from '../utils/utils.js';
 export default {
     signup: async (parent, args, context, info) => {
         const password = await bcrypt.hash(args.password, 10);
-        const user = await context.prisma.user.create({
-            data: { ...args, password },
-        });
+        let user;
+        try {
+            user = await context.prisma.user.create({
+                data: { ...args, password },
+            });
+        } catch (error) {
+            if (error.code === 'P2002') {
+                throw new GraphQLError('User with this email already exists', {
+                    extensions: { code: 'BAD_USER_INPUT' },
+                });
+            }
+            throw error;
+        }
         const token = jwt.sign({ userId: user.id }, APP_SECRET);
 
         return {

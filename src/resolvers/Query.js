@@ -14,7 +14,11 @@ export default {
             where,
             skip: args.skip,
             take: args.take,
-            orderBy: args.orderBy,
+            orderBy: args.orderBy
+                ? Object.entries(args.orderBy).map(([field, sort]) => ({
+                      [field]: sort,
+                  }))
+                : undefined,
         });
 
         const count = await context.prisma.link.count({ where });

@@ -28,3 +28,11 @@ export const getUserId = (req, authToken) => {
 
     throw new Error('Not authenticated');
 };
+
+export const getOptionalUserId = (req, authToken) => {
+    try {
+        return getUserId(req, authToken);
+    } catch {
+        return null;
+    }
+};
