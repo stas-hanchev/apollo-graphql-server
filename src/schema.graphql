@@ -1,6 +1,8 @@
 type Query {
     info: String!
     feed(filter: String, skip: Int, take: Int, orderBy: LinkOrderByInput): Feed!
+    link(id: ID!): Link
+    me: User
 }
 
 type Feed {
@@ -12,8 +14,8 @@ type Mutation {
     post(url: String!, description: String!): Link!
     updateLink(id: ID!, url: String, description: String): Link!
     deleteLink(id: ID!): Link!
-    signup(name: String!, email: String!, password: String!): AuthPayload
-    login(email: String!, password: String!): AuthPayload
+    signup(name: String!, email: String!, password: String!): AuthPayload!
+    login(email: String!, password: String!): AuthPayload!
 }
 
 type Subscription {
@@ -42,13 +44,13 @@ enum Sort {
 }
 
 type AuthPayload {
-    token: String
-    user: User
+    token: String!
+    user: User!
 }
 
 type User {
     id: ID!
     name: String!
-    email: String!
-    links: [Link!]!
+    email: String
+    links(skip: Int, take: Int): [Link!]!
 }

@@ -22,6 +22,8 @@ npm run dev                   # http://localhost:4000/graphql
 DATABASE_URL="file:./dev.db"
 APP_SECRET="change-me"
 PORT=4000
+JWT_EXPIRES_IN="7d"   # token lifetime, default 7d
+# TRUST_PROXY=1       # behind a reverse proxy: lets rate limiting see real client IPs
 ```
 
 ## Scripts
@@ -30,7 +32,7 @@ PORT=4000
 npm run dev          # start with auto-reload
 npm start            # start
 npm run build        # generate Prisma Client
-npm run start:prod   # apply migrations + start
+npm run start:prod   # apply migrations + start with NODE_ENV=production
 npm run studio       # Prisma Studio (database browser)
 ```
 
@@ -59,6 +61,18 @@ pm2 save && pm2 startup
 - WebSocket (subscriptions): `ws://localhost:4000/graphql`
 
 Authorization: `Authorization: Bearer <token>` header (for WS — `connectionParams.authToken`).
+Tokens expire after `JWT_EXPIRES_IN`; an invalid or expired token is treated as anonymous (`me` returns `null`).
+
+## API limits and errors
+
+- `feed` / `User.links`: `skip >= 0`, `take` 1–50 (default 10).
+- Query depth is limited to 6 levels (introspection fields are not counted).
+- `login`: 10 failed attempts per IP per 15 minutes; `signup`: 5 per IP per hour.
+- `User.email` is visible only to the user themselves (`null` for others).
+- Error codes in `extensions.code`: `UNAUTHENTICATED`, `FORBIDDEN`, `NOT_FOUND`, `BAD_USER_INPUT`,
+  `TOO_MANY_REQUESTS` (with `retryAfter` seconds), `GRAPHQL_VALIDATION_FAILED`.
+  Unexpected errors are logged on the server and returned as `INTERNAL_SERVER_ERROR` / "Internal server error".
+- With `NODE_ENV=production` (`npm run start:prod`) introspection and stack traces are disabled.
 
 ## Example operations
 
@@ -69,6 +83,8 @@ mutation { post(url: "https://graphql.org", description: "GraphQL") { id } }
 mutation { updateLink(id: 1, description: "GraphQL docs") { id url description } }   # author only
 mutation { deleteLink(id: 1) { id } }                                                  # author only
 query    { feed(filter: "graphql", skip: 0, take: 10, orderBy: { createdAt: desc }) { count links { id url } } }
+query    { link(id: 1) { id url description postedBy { id name } } }
+query    { me { id name email } }                                                     # null when not authenticated
 subscription { newLink { id url description } }
 subscription { updatedLink { id url description } }
 subscription { deletedLink }                                                           # returns the deleted link id

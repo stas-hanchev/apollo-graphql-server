@@ -1,21 +1,20 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import validateLinkInput, { validateLinkUpdate } from '../validation/url.js';
-import { APP_SECRET } from '../utils/utils.js';
-import { badInput, forbidden, notFound } from '../utils/errors.js';
+import { createToken } from '../utils/utils.js';
+import {
+    badInput,
+    forbidden,
+    notFound,
+    parseId,
+    requireUserId,
+} from '../utils/errors.js';
+import { loginLimiter, signupLimiter } from '../utils/rateLimit.js';
 
 const INVALID_CREDENTIALS = 'Invalid email or password';
 
 const findOwnLink = async (id, context) => {
-    const { userId } = context;
-    if (!userId) {
-        throw new Error('Not authenticated');
-    }
-
-    const linkId = Number(id);
-    if (!Number.isInteger(linkId)) {
-        throw badInput('id must be an integer');
-    }
+    const userId = requireUserId(context);
+    const linkId = parseId(id);
 
     const link = await context.prisma.link.findUnique({
         where: { id: linkId },
@@ -32,6 +31,10 @@ const findOwnLink = async (id, context) => {
 
 export default {
     signup: async (parent, args, context, info) => {
+        const limitKey = context.ip;
+        signupLimiter.check(limitKey);
+        signupLimiter.hit(limitKey);
+
         const password = await bcrypt.hash(args.password, 10);
         let user;
         try {
@@ -44,41 +47,39 @@ export default {
             }
             throw error;
         }
-        const token = jwt.sign({ userId: user.id }, APP_SECRET);
+        context.userId = user.id;
 
         return {
-            token,
+            token: createToken(user.id),
             user,
         };
     },
 
     login: async (parent, args, context, info) => {
+        const limitKey = context.ip;
+        loginLimiter.check(limitKey);
+
         const user = await context.prisma.user.findUnique({
             where: { email: args.email },
         });
-        if (!user) {
-            throw badInput(INVALID_CREDENTIALS);
-        }
-
-        const valid = await bcrypt.compare(args.password, user.password);
+        const valid =
+            user != null && (await bcrypt.compare(args.password, user.password));
         if (!valid) {
+            loginLimiter.hit(limitKey);
             throw badInput(INVALID_CREDENTIALS);
         }
 
-        const token = jwt.sign({ userId: user.id }, APP_SECRET);
+        context.userId = user.id;
 
         return {
-            token,
+            token: createToken(user.id),
             user,
         };
     },
 
     post: async (parent, args, context, info) => {
+        const userId = requireUserId(context);
         validateLinkInput(args);
-        const { userId } = context;
-        if (!userId) {
-            throw new Error('Not authenticated');
-        }
 
         const newLink = await context.prisma.link.create({
             data: {
