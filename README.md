@@ -70,4 +70,6 @@ mutation { updateLink(id: 1, description: "GraphQL docs") { id url description }
 mutation { deleteLink(id: 1) { id } }                                                  # author only
 query    { feed(filter: "graphql", skip: 0, take: 10, orderBy: { createdAt: desc }) { count links { id url } } }
 subscription { newLink { id url description } }
+subscription { updatedLink { id url description } }
+subscription { deletedLink }                                                           # returns the deleted link id
 ```

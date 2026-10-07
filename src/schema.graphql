@@ -18,6 +18,8 @@ type Mutation {
 
 type Subscription {
     newLink: Link
+    updatedLink: Link
+    deletedLink: ID
 }
 
 type Link {

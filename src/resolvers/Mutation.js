@@ -97,20 +97,26 @@ export default {
         validateLinkUpdate({ url, description });
         const link = await findOwnLink(id, context);
 
-        return await context.prisma.link.update({
+        const updatedLink = await context.prisma.link.update({
             where: { id: link.id },
             data: {
                 ...(url != null && { url }),
                 ...(description != null && { description }),
             },
         });
+        context.pubsub.publish('LINK_UPDATED', updatedLink);
+
+        return updatedLink;
     },
 
     deleteLink: async (parent, args, context, info) => {
         const link = await findOwnLink(args.id, context);
 
-        return await context.prisma.link.delete({
+        const deletedLink = await context.prisma.link.delete({
             where: { id: link.id },
         });
+        context.pubsub.publish('LINK_DELETED', deletedLink);
+
+        return deletedLink;
     },
 };
